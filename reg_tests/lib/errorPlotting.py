@@ -266,7 +266,7 @@ def exportCaseSummary(path, case, results):
         html.write( _htmlTail() )
     html.close()
 
-def exportCombinedSummary(self, path, case, results, testSolution, plotList, relativeNorm, maxNorm):
+def exportCombinedSummary(path, case, results, testSolution, plotList, relativeNorm, maxNorm):
   """
   testSolution, plotList, relativeNorm, maxNorm
   path, case, results
@@ -277,98 +277,86 @@ def exportCombinedSummary(self, path, case, results, testSolution, plotList, rel
     
     html.write('<body>' + '\n')
     html.write('  <h2 class="text-center">{}</h2>'.format(case + " Summary") + '\n')
-    html.write('  <h4 class="text-center"><a href="plots/plots.html">Go To Plots</a></h2>' + '\n')
+    # html.write('  <h4 class="text-center"><a href="plots/plots.html">Go To Plots</a></h2>' + '\n')
     html.write('  <h4 class="text-center">Maximum values for each norm are highlighted</h2>' + '\n')
     html.write('  <div class="container">' + '\n')
     
     # Channel - Relative Norm - Max Norm
-    data = [(r[0], r[1], r[2]) for i,r in enumerate(results)]
-    maxRelNorm = max([r[1] for i,r in enumerate(results)])
-    maxMaxNorm = max([r[2] for i,r in enumerate(results)])
+    # For the summary
+    data_s = [(r[0], r[1], r[2]) for i,r in enumerate(results)]
+    maxRelNorm_s = max([r[1] for i,r in enumerate(results)])
+    maxMaxNorm_s = max([r[2] for i,r in enumerate(results)])
+    # For the plots
+    # TODO: fix for multiple operating systems
+    data_p = [('<button type="button" class="btn btn-info" data-toggle="collapse" data-target="#{0}">{0}</button>'.format(plot), relativeNorm[i], maxNorm[i]) for i,plot in enumerate(plotList)]    
+    maxRelNorm_p = max(relativeNorm)
+    maxMaxNorm_p = max(maxNorm)
+
     table = _tableHead(['Channel', 'Relative Max Norm', 'Infinity Norm'])
     body = '      <tbody>' + '\n'
     
-    for i, d in enumerate(data):
+    i_p = 0
+    for i, d in enumerate(data_s):
       body += '        <tr>' + '\n'
       body += '          <th scope="row">{}</th>'.format(i+1) + '\n'
-      body += '          <td>{0:s}</td>'.format(d[0]) + '\n'
-      
       fmt = '{0:0.4e}'
-      if d[1] == maxRelNorm:
-        body += ('          <td class="cell-highlight">' + fmt + '</td>').format(d[1]) + '\n'
+
+      # print(d[0])
+      # print(data_p[i_p])
+      if (d[0] in plotList):
+        
+        plot_path = os.path.join('plots',d[0])
+        body += '          <td>{0:s}</td>'.format(data_p[i_p][0]) + '\n'
+
+        if data_p[i_p][1] == maxRelNorm_p:                                        # cell-highlight
+            body += ('          <td data-toggle="collapse" data-target="#{}" class="clickable">'.format(d[0]) + fmt + '</td>').format(data_p[i_p][1]) + '\n'
+        else:
+            body += ('          <td>' + fmt + '</td>').format(data_p[i_p][1]) + '\n'
+                
+        if data_p[i_p][2] == maxMaxNorm_p:
+            body += ('          <td data-toggle="collapse" data-target="#{}" class="clickable">'.format(d[0]) + fmt + '</td>').format(data_p[i_p][2]) + '\n'
+        else:
+            body += ('          <td>' + fmt + '</td>').format(data_p[i_p][2]) + '\n'
+        
+        body += '        </tr>'
+        body += ('        <tr><td colspan="4"><div id="{}" class="collapse">'.format(d[0]) + '<img src="{}" class="center-block">'.format(plot_path+".png") + '</div></td></tr>') + '\n'
+        # body += '        <tbody>'
+        i_p += 1
+
       else:
-        body += ('          <td>' + fmt + '</td>').format(d[1]) + '\n'
-              
-      if d[2] == maxMaxNorm:
-        body += ('          <td class="cell-highlight">' + fmt + '</td>').format(d[2]) + '\n'
-      else:
-        body += ('          <td>' + fmt + '</td>').format(d[2]) + '\n'
-      body += '        </tr>' + '\n'
+      
+        body += '          <td>{0:s}</td>'.format(d[0]) + '\n'
+      
+        if d[1] == maxRelNorm_s:
+          body += ('          <td class="cell-highlight">' + fmt + '</td>').format(d[1]) + '\n'
+        else:
+          body += ('          <td>' + fmt + '</td>').format(d[1]) + '\n'
+                
+        if d[2] == maxMaxNorm_s:
+          body += ('          <td class="cell-highlight">' + fmt + '</td>').format(d[2]) + '\n'
+        else:
+          body += ('          <td>' + fmt + '</td>').format(d[2]) + '\n'
+      
+        body += '        </tr>' + '\n'
+
     body += '      </tbody>' + '\n'
     table += body
     table += '    </table>' + '\n'
     html.write(table)
     
-    html.write('    <br>' + '\n')
-    html.write('    <div class="row">' + '\n')
-    for i,plot in enumerate(plotList):
-      html.write('      <div id={} class="col-sm-12 col-md-6 col-lg-6">'.format(plot) + '\n')
-      html.write('        <img src="{}" class="center-block img-responsive thumbnail">'.format(plot+".png") + '\n')
-      html.write('      </div>' + '\n')
-    html.write('    </div>' + '\n')
+    # html.write('    <br>' + '\n')
+    # html.write('    <div class="row">' + '\n')
+
+    # for i,plot in enumerate(plotList):
+    #   plot_path = os.path.join('plots',plot)
+    #   html.write('      <div id={} class="col-sm-12 col-md-6 col-lg-6">'.format(plot_path) + '\n')
+    #   html.write('        <img src="{}" class="center-block img-responsive thumbnail">'.format(plot_path+".png") + '\n')
+    #   html.write('      </div>' + '\n')
+    # html.write('    </div>' + '\n')
+
     html.write('  </div>' + '\n')
     html.write('</body>' + '\n')
     html.write( _htmlTail() )
-###########
-    basePath = os.path.sep.join(testSolution.split(os.path.sep)[:-1])
-    plotPath = os.path.join(basePath, "plots")
-    caseName = basePath.split(os.path.sep)[-1]
-    rtl.validateDirOrMkdir(plotPath)
-    
-    with open(os.path.join(plotPath, "plots.html"), "w") as html:
-        
-        html.write( _htmlHead(caseName) )
-        
-        html.write('<body>' + '\n')
-        html.write('  <h2 class="text-center">{}</h2>'.format(caseName) + '\n')
-        html.write('  <div class="container">' + '\n')
-        html.write('  <h4 class="text-center">Maximum values for each norm are highlighted</h2>' + '\n')
-        
-        # Channel - Relative Norm - Max Norm
-        data = [('<a href="#{0}">{0}</a>'.format(plot), relativeNorm[i], maxNorm[i]) for i,plot in enumerate(plotList)]    
-        maxRelNorm = max(relativeNorm)
-        maxMaxNorm = max(maxNorm)
-        table = _tableHead(['Channel', 'Relative Max Norm', 'Infinity Norm'])
-        body = '      <tbody>' + '\n'
-        for i, d in enumerate(data):
-            body += '        <tr>' + '\n'
-            body += '          <th scope="row">{}</th>'.format(i+1) + '\n'
-            body += '          <td>{0:s}</td>'.format(d[0]) + '\n'
-            
-            fmt = '{0:0.4e}'
-            if d[1] == maxRelNorm:
-                body += ('          <td class="cell-highlight">' + fmt + '</td>').format(d[1]) + '\n'
-            else:
-                body += ('          <td>' + fmt + '</td>').format(d[1]) + '\n'
-                    
-            if d[2] == maxMaxNorm:
-                body += ('          <td class="cell-highlight">' + fmt + '</td>').format(d[2]) + '\n'
-            else:
-                body += ('          <td>' + fmt + '</td>').format(d[2]) + '\n'
-            body += '        </tr>' + '\n'
-        body += '      </tbody>' + '\n'
-        table += body
-        table += '    </table>' + '\n'
-        html.write(table)
-        
-        html.write('    <br>' + '\n')
-        html.write('    <div class="row">' + '\n')
-        for i,plot in enumerate(plotList):
-            html.write('      <div id={} class="col-sm-12 col-md-6 col-lg-6">'.format(plot) + '\n')
-            html.write('        <img src="{}" class="center-block img-responsive thumbnail">'.format(plot+".png") + '\n')
-            html.write('      </div>' + '\n')
-        html.write('    </div>' + '\n')
-        html.write('  </div>' + '\n')
-        html.write('</body>' + '\n')
-        html.write( _htmlTail() )
-    html.close()
+
+  html.close()
+

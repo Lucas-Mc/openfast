@@ -164,16 +164,20 @@ normalizedNorm, maxNorm = pass_fail.calculateNorms(testData, baselineData, toler
 
 # export all case summaries
 results = list(zip(testInfo["attribute_names"], normalizedNorm, maxNorm))
-exportCaseSummary(testBuildDirectory, caseName, results)
+# path = testBuildDirectory
+# case = caseName
+# results = results
+# exportCaseSummary(testBuildDirectory, caseName, results)
 
 # failing case
 if not pass_fail.passRegressionTest(normalizedNorm, tolerance):
     if plotError:
-        from errorPlotting import initializePlotDirectory, plotOpenfastError
+        from errorPlotting import initializePlotDirectory, plotOpenfastError, exportCombinedSummary
         failChannels = [channel for i,channel in enumerate(testInfo["attribute_names"]) if normalizedNorm[i] > tolerance]
         failRelNorm = [normalizedNorm[i] for i,channel in enumerate(testInfo["attribute_names"]) if normalizedNorm[i] > tolerance]
         failMaxNorm = [maxNorm[i] for i,channel in enumerate(testInfo["attribute_names"]) if normalizedNorm[i] > tolerance]
-        initializePlotDirectory(localOutFile, failChannels, failRelNorm, failMaxNorm)
+        # initializePlotDirectory(localOutFile, failChannels, failRelNorm, failMaxNorm)
+        exportCombinedSummary(testBuildDirectory, caseName, results, localOutFile, failChannels, failRelNorm, failMaxNorm)
         for channel in failChannels:
             try:
                 plotOpenfastError(localOutFile, baselineOutFile, channel)

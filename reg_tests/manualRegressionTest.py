@@ -79,6 +79,9 @@ for case in casenames:
     print(resultString)
 
 from errorPlotting import exportResultsSummary
+# path = buildDirectory
+# results = results
+
 exportResultsSummary(buildDirectory, results)
 
 print("\nRegression test execution completed with these results:")
