@@ -51,19 +51,19 @@ def _plotError(xseries, y1series, y2series, xlabel, title1, title2):
 
     plt.figure()
 
-    ax = plt.subplot(211)
+    # ax = plt.subplot(211)
     plt.title(title1)
     plt.grid(True)
     plt.plot(xseries, y2series, "g", linestyle="solid", linewidth=3, label = "Baseline")
     plt.plot(xseries, y1series, "r", linestyle="solid", linewidth=1, label = "Local")
     plt.legend()
     
-    ax = plt.subplot(212)
-    plt.title(title2)
-    plt.grid(True)
-    plt.plot(xseries, abs(y2series - y1series))
-    plt.xlabel(xlabel)
-    ax.yaxis.set_major_formatter(FormatStrFormatter('%.1e'))
+    # ax = plt.subplot(212)
+    # plt.title(title2)
+    # plt.grid(True)
+    # plt.plot(xseries, abs(y2series - y1series))
+    # plt.xlabel(xlabel)
+    # ax.yaxis.set_major_formatter(FormatStrFormatter('%.1e'))
     
     plt.tight_layout()
     
@@ -102,18 +102,12 @@ def _htmlHead(title):
     head  = '<!DOCTYPE html>' + '\n'
     head += '<html>' + '\n'
     head += '<head>' + '\n'
-    head += '  <title>{}</title>'.format(title) + '\n'
-    head += '  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">' + '\n'
-    head += '  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>' + '\n'
-    head += '  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>' + '\n'
-    head += '  <style media="screen" type="text/css">'
-    head += '    .cell-warning {'
-    head += '      background-color: #FF6666;'
-    head += '    }'
-    head += '    .cell-highlight {'
-    head += '      background-color: #E5E589;'
-    head += '    }'
-    head += '  </style>'
+    head += '  <title>5MW_ITIBarge_DLL_WTurb_WavesIrr Summary</title>' + '\n'
+    head += '  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>' + '\n'
+    head += '  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>' + '\n'
+    head += '  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>' + '\n'
+    head += '  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">' + '\n'
+    head += '  <style media="screen" type="text/css">    .cell-warning {      background-color: #FF6666;    }    .cell-highlight {      background-color: #E5E589;    }  </style>' + '\n'
     head += '</head>' + '\n'
     return head
 
@@ -187,6 +181,7 @@ def initializePlotDirectory(testSolution, plotList, relativeNorm, maxNorm):
     html.close()
     
 def exportResultsSummary(path, results):
+    print(results)
     with open(os.path.join(path, "regression_test_summary.html"), "w") as html:
         
         html.write( _htmlHead("Regression Test Summary") )
@@ -229,8 +224,8 @@ def exportCaseSummary(path, case, results):
         
         html.write('<body>' + '\n')
         html.write('  <h2 class="text-center">{}</h2>'.format(case + " Summary") + '\n')
-        html.write('  <h4 class="text-center"><a href="plots/plots.html">Go To Plots</a></h2>' + '\n')
-        html.write('  <h4 class="text-center">Maximum values for each norm are highlighted</h2>' + '\n')
+        html.write('  <h4 class="text-center"><a href="plots/plots.html">Go To Plots</a></h4>' + '\n')
+        html.write('  <h4 class="text-center">Maximum values for each norm are highlighted</h4>' + '\n')
         html.write('  <div class="container">' + '\n')
         
         # Channel - Relative Norm - Max Norm
@@ -279,7 +274,8 @@ def exportCombinedSummary(path, case, results, testSolution, plotList, relativeN
     html.write('  <h2 class="text-center">{}</h2>'.format(case + " Summary") + '\n')
     # html.write('  <h4 class="text-center"><a href="plots/plots.html">Go To Plots</a></h2>' + '\n')
     html.write('  <h4 class="text-center">Maximum values for each norm are highlighted</h2>' + '\n')
-    html.write('  <div class="container">' + '\n')
+    
+    # html.write('  <div class="container">' + '\n')
     
     # Channel - Relative Norm - Max Norm
     # For the summary
@@ -292,69 +288,83 @@ def exportCombinedSummary(path, case, results, testSolution, plotList, relativeN
     maxRelNorm_p = max(relativeNorm)
     maxMaxNorm_p = max(maxNorm)
 
-    table = _tableHead(['Channel', 'Relative Max Norm', 'Infinity Norm'])
-    body = '      <tbody>' + '\n'
+    # table = _tableHead(['Channel', 'Relative Max Norm', 'Infinity Norm'])
+    # body = '      <tbody>' + '\n'
+    body = '  <div class="container">\n'
     
     i_p = 0
+    ncols = 3
     for i, d in enumerate(data_s):
-      body += '        <tr>' + '\n'
-      body += '          <th scope="row">{}</th>'.format(i+1) + '\n'
+      current_row = (i)//ncols
+      current_col = (i)%ncols
+      # print('({0},{1})'.format(current_row,current_col))
+      
+      if (current_col == 0):
+        body += '    <div class="row">\n'
+      
+      # body += '        <tr>' + '\n'
+      # Write the current channel number to the table
+      # body += '          <th scope="row">{}</th>'.format(i+1) + '\n'
       fmt = '{0:0.4e}'
 
-      # print(d[0])
-      # print(data_p[i_p])
-      if (d[0] in plotList):
+      # if (d[0] in plotList):
         
-        plot_path = os.path.join('plots',d[0])
-        body += '          <td>{0:s}</td>'.format(data_p[i_p][0]) + '\n'
+      plot_path = os.path.join('plots',d[0])
+      # Write the current channel button to the table
+      body += '      <div class="col-sm">\n'
+      body += '        <div>{0:s}</div>\n'.format(data_p[i_p][0])
+      # body += '          <td>{0:s}</td>'.format(data_p[i_p][0]) + '\n'
 
-        if data_p[i_p][1] == maxRelNorm_p:                                        # cell-highlight
-            body += ('          <td data-toggle="collapse" data-target="#{}" class="clickable">'.format(d[0]) + fmt + '</td>').format(data_p[i_p][1]) + '\n'
-        else:
-            body += ('          <td>' + fmt + '</td>').format(data_p[i_p][1]) + '\n'
+      # Write the current Relative Max Norm to the table
+      # if data_p[i_p][1] == maxRelNorm_p:                                        # cell-highlight
+      #   body += ('          <td data-toggle="collapse" data-target="#{}" class="clickable">'.format(d[0]) + fmt + '</td>').format(data_p[i_p][1]) + '\n'
+      # else:
+      #   body += ('          <td>' + fmt + '</td>').format(data_p[i_p][1]) + '\n'
+              
+      # Write the current Infinity Norm to the table
+      # if data_p[i_p][2] == maxMaxNorm_p:
+      #   body += ('          <td data-toggle="collapse" data-target="#{}" class="clickable">'.format(d[0]) + fmt + '</td>').format(data_p[i_p][2]) + '\n'
+      # else:
+      #   body += ('          <td>' + fmt + '</td>').format(data_p[i_p][2]) + '\n'
+      
+      # body += '        </tr>'
+      body += '        <div id="{}" class="collapse">\n'.format(d[0])
+      body += '          <img src="{}" class="center-block" style="width:100%">\n'.format(plot_path+".png")
+      body += '        </div>\n'
+      # body += ('        <tr><td colspan="4"><div id="{}" class="collapse">'.format(d[0]) + '<img src="{}" class="center-block">'.format(plot_path+".png") + '</div></td></tr>') + '\n'
+      i_p += 1
+      body += '      </div>\n'
+
+      if (current_col == (ncols-1)):
+        body += '    </div>\n'
+
+      # else:
+
+      #   print('HHHHHhHHHHHHHHHHHHHHHHHHH')
+      #   # Write the current Relative Max Norm to the table
+      #   # body += '          <td>{0:s}</td>'.format(d[0]) + '\n'
+      
+      #   # Write the current Infinity Norm to the table
+      #   if d[1] == maxRelNorm_s:
+      #     body += ('          <td class="cell-highlight">' + fmt + '</td>').format(d[1]) + '\n'
+      #   else:
+      #     body += ('          <td>' + fmt + '</td>').format(d[1]) + '\n'
                 
-        if data_p[i_p][2] == maxMaxNorm_p:
-            body += ('          <td data-toggle="collapse" data-target="#{}" class="clickable">'.format(d[0]) + fmt + '</td>').format(data_p[i_p][2]) + '\n'
-        else:
-            body += ('          <td>' + fmt + '</td>').format(data_p[i_p][2]) + '\n'
-        
-        body += '        </tr>'
-        body += ('        <tr><td colspan="4"><div id="{}" class="collapse">'.format(d[0]) + '<img src="{}" class="center-block">'.format(plot_path+".png") + '</div></td></tr>') + '\n'
-        # body += '        <tbody>'
-        i_p += 1
-
-      else:
+      #   if d[2] == maxMaxNorm_s:
+      #     body += ('          <td class="cell-highlight">' + fmt + '</td>').format(d[2]) + '\n'
+      #   else:
+      #     body += ('          <td>' + fmt + '</td>').format(d[2]) + '\n'
       
-        body += '          <td>{0:s}</td>'.format(d[0]) + '\n'
-      
-        if d[1] == maxRelNorm_s:
-          body += ('          <td class="cell-highlight">' + fmt + '</td>').format(d[1]) + '\n'
-        else:
-          body += ('          <td>' + fmt + '</td>').format(d[1]) + '\n'
-                
-        if d[2] == maxMaxNorm_s:
-          body += ('          <td class="cell-highlight">' + fmt + '</td>').format(d[2]) + '\n'
-        else:
-          body += ('          <td>' + fmt + '</td>').format(d[2]) + '\n'
-      
-        body += '        </tr>' + '\n'
+      #   body += '        </tr>' + '\n'
 
-    body += '      </tbody>' + '\n'
-    table += body
-    table += '    </table>' + '\n'
-    html.write(table)
-    
-    # html.write('    <br>' + '\n')
-    # html.write('    <div class="row">' + '\n')
+    body += '  </div>\n'
+    # body += '      </tbody>' + '\n'
+    # table += body
+    # table += '    </table>' + '\n'
+    # html.write(table)
+    html.write(body)
 
-    # for i,plot in enumerate(plotList):
-    #   plot_path = os.path.join('plots',plot)
-    #   html.write('      <div id={} class="col-sm-12 col-md-6 col-lg-6">'.format(plot_path) + '\n')
-    #   html.write('        <img src="{}" class="center-block img-responsive thumbnail">'.format(plot_path+".png") + '\n')
-    #   html.write('      </div>' + '\n')
-    # html.write('    </div>' + '\n')
-
-    html.write('  </div>' + '\n')
+    # html.write('  </div>' + '\n')
     html.write('</body>' + '\n')
     html.write( _htmlTail() )
 
