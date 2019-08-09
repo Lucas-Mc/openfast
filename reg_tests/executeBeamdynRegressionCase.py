@@ -126,14 +126,17 @@ failChannels = [channel for i,channel in enumerate(testInfo["attribute_names"])]
 failRelNorm = [relativeNorm[i] for i,channel in enumerate(testInfo["attribute_names"])]# if relativeNorm[i] > tolerance]
 failMaxNorm = [maxNorm[i] for i,channel in enumerate(testInfo["attribute_names"])] # if relativeNorm[i] > tolerance]
 # initializePlotDirectory(localOutFile, failChannels, failRelNorm, failMaxNorm)
-exportCombinedSummary(testBuildDirectory, caseName, results, localOutFile, failChannels, failRelNorm, failMaxNorm)
+
+div_string_mat = []
 for channel in failChannels:
   try:
-    plotOpenfastError(localOutFile, baselineOutFile, channel)
+    div_string_mat.append(plotOpenfastError(localOutFile, baselineOutFile, channel, use_plotly=True))
   except:
     error = sys.exc_info()[1]
     print("Error generating plots: {}".format(error.msg))
 # sys.exit(1)
+
+exportCombinedSummary(testBuildDirectory, caseName, results, localOutFile, failChannels, failRelNorm, failMaxNorm, div_string_mat)
     
 # passing case
 sys.exit(0)
