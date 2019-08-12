@@ -32,7 +32,7 @@ import subprocess
 import rtestlib as rtl
 import openfastDrivers
 import pass_fail
-from errorPlotting import exportCaseSummary
+# from errorPlotting import exportCaseSummary
 
 ##### Helper functions
 def ignoreBaselineItems(directory, contents):

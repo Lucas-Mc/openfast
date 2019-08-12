@@ -30,6 +30,7 @@ import plotly.offline
 import plotly.graph_objs as go
 
 def _validateAndExpandInputs(argv):
+  
     rtl.validateInputOrExit(argv, 3, "solution1 solution2 attribute")
     testSolution = argv[0]
     baselineSolution = argv[1]
@@ -39,6 +40,7 @@ def _validateAndExpandInputs(argv):
     return (testSolution, baselineSolution, attribute)
 
 def _parseSolution(solution):
+
     try:
         data, info, _ = load_output(solution)
         return (data, info)
@@ -46,6 +48,7 @@ def _parseSolution(solution):
         rtl.exitWithError("Error: {}".format(e))
 
 def _plotError(xseries, y1series, y2series, xlabel, title1, title2, use_plotly=False):
+
     import matplotlib
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
@@ -91,28 +94,22 @@ def _plotError(xseries, y1series, y2series, xlabel, title1, title2, use_plotly=F
 
       plt.figure()
 
-      # ax = plt.subplot(211)
       plt.title(title1)
       plt.grid(True)
       plt.plot(xseries, y2series, "g", linestyle="solid", linewidth=3, label = "Baseline")
       plt.plot(xseries, y1series, "r", linestyle="solid", linewidth=1, label = "Local")
       plt.legend()
-      
-      # ax = plt.subplot(212)
-      # plt.title(title2)
-      # plt.grid(True)
-      # plt.plot(xseries, abs(y2series - y1series))
-      # plt.xlabel(xlabel)
-      # ax.yaxis.set_major_formatter(FormatStrFormatter('%.1e'))
-      
+            
       plt.tight_layout()
     
       return plt
 
 def _savePlot(plt, path, foutname):
+
     plt.savefig(os.path.join(path, foutname+".png"))
 
 def plotOpenfastError(testSolution, baselineSolution, attribute, use_plotly=False):
+
     testSolution, baselineSolution, attribute = _validateAndExpandInputs([testSolution, baselineSolution, attribute])
     dict1, info1 = _parseSolution(testSolution)
     dict2, info2 = _parseSolution(baselineSolution)
@@ -147,6 +144,7 @@ def plotOpenfastError(testSolution, baselineSolution, attribute, use_plotly=Fals
       plt.close()
     
 def _htmlHead(title):
+
     head  = '<!DOCTYPE html>' + '\n'
     head += '<html>' + '\n'
     head += '<head>' + '\n'
@@ -162,10 +160,12 @@ def _htmlHead(title):
     return head
 
 def _htmlTail():
+
     tail = '</html>' + '\n'
     return tail
 
 def _tableHead(columns):
+
     head  = '    <table class="table table-bordered table-hover table-sm" style="margin: auto; width: 50%">' + '\n'
     head += '      <thead>' + '\n'
     head += '        <tr>' + '\n'
@@ -175,63 +175,9 @@ def _tableHead(columns):
     head += '        </tr>' + '\n'
     head += '      </thead>' + '\n'
     return head
-    
-def initializePlotDirectory(testSolution, plotList, relativeNorm, maxNorm):
-    basePath = os.path.sep.join(testSolution.split(os.path.sep)[:-1])
-    plotPath = os.path.join(basePath, "plots")
-    caseName = basePath.split(os.path.sep)[-1]
-    rtl.validateDirOrMkdir(plotPath)
-    
-    with open(os.path.join(plotPath, "plots.html"), "w") as html:
-        
-        html.write( _htmlHead(caseName) )
-        
-        html.write('<body>' + '\n')
-        html.write('  <h2 class="text-center">{}</h2>'.format(caseName) + '\n')
-        html.write('  <div class="container">' + '\n')
-        html.write('  <h4 class="text-center">Maximum values for each norm are highlighted</h2>' + '\n')
-        
-        # Channel - Relative Norm - Max Norm
-        data = [('<a href="#{0}">{0}</a>'.format(plot), relativeNorm[i], maxNorm[i]) for i,plot in enumerate(plotList)]    
-        maxRelNorm = max(relativeNorm)
-        maxMaxNorm = max(maxNorm)
-        table = _tableHead(['Channel', 'Relative Max Norm', 'Infinity Norm'])
-        body = '      <tbody>' + '\n'
-        for i, d in enumerate(data):
-            body += '        <tr>' + '\n'
-            body += '          <th scope="row">{}</th>'.format(i+1) + '\n'
-            body += '          <td>{0:s}</td>'.format(d[0]) + '\n'
-            
-            fmt = '{0:0.4e}'
-            if d[1] == maxRelNorm:
-                body += ('          <td class="cell-highlight">' + fmt + '</td>').format(d[1]) + '\n'
-            else:
-                body += ('          <td>' + fmt + '</td>').format(d[1]) + '\n'
-                    
-            if d[2] == maxMaxNorm:
-                body += ('          <td class="cell-highlight">' + fmt + '</td>').format(d[2]) + '\n'
-            else:
-                body += ('          <td>' + fmt + '</td>').format(d[2]) + '\n'
-            body += '        </tr>' + '\n'
-        body += '      </tbody>' + '\n'
-        table += body
-        table += '    </table>' + '\n'
-        html.write(table)
-        
-        html.write('    <br>' + '\n')
-        html.write('    <div class="row">' + '\n')
-        for i,plot in enumerate(plotList):
-            html.write('      <div id={} class="col-sm-12 col-md-6 col-lg-6">'.format(plot) + '\n')
-            html.write('        <img src="{}" class="center-block img-responsive thumbnail">'.format(plot+".png") + '\n')
-            html.write('      </div>' + '\n')
-        html.write('    </div>' + '\n')
-        html.write('  </div>' + '\n')
-        html.write('</body>' + '\n')
-        html.write( _htmlTail() )
-    html.close()
-    
+      
 def exportResultsSummary(path, results):
-    print(results)
+
     with open(os.path.join(path, "regression_test_summary.html"), "w") as html:
         
         html.write( _htmlHead("Regression Test Summary") )
@@ -267,50 +213,6 @@ def exportResultsSummary(path, results):
         html.write( _htmlTail() )
     html.close()
     
-def exportCaseSummary(path, case, results):
-    with open(os.path.join(path, case+".html"), "w") as html:
-        
-        html.write( _htmlHead(case + " Summary") )
-        
-        html.write('<body>' + '\n')
-        html.write('  <h2 class="text-center">{}</h2>'.format(case + " Summary") + '\n')
-        html.write('  <h4 class="text-center"><a href="plots/plots.html">Go To Plots</a></h4>' + '\n')
-        html.write('  <h4 class="text-center">Maximum values for each norm are highlighted</h4>' + '\n')
-        html.write('  <div class="container">' + '\n')
-        
-        # Channel - Relative Norm - Max Norm
-        data = [(r[0], r[1], r[2]) for i,r in enumerate(results)]
-        maxRelNorm = max([r[1] for i,r in enumerate(results)])
-        maxMaxNorm = max([r[2] for i,r in enumerate(results)])
-        table = _tableHead(['Channel', 'Relative Max Norm', 'Infinity Norm'])
-        body = '      <tbody>' + '\n'
-        for i, d in enumerate(data):
-            body += '        <tr>' + '\n'
-            body += '          <th scope="row">{}</th>'.format(i+1) + '\n'
-            body += '          <td>{0:s}</td>'.format(d[0]) + '\n'
-            
-            fmt = '{0:0.4e}'
-            if d[1] == maxRelNorm:
-                body += ('          <td class="cell-highlight">' + fmt + '</td>').format(d[1]) + '\n'
-            else:
-                body += ('          <td>' + fmt + '</td>').format(d[1]) + '\n'
-                    
-            if d[2] == maxMaxNorm:
-                body += ('          <td class="cell-highlight">' + fmt + '</td>').format(d[2]) + '\n'
-            else:
-                body += ('          <td>' + fmt + '</td>').format(d[2]) + '\n'
-            body += '        </tr>' + '\n'
-        body += '      </tbody>' + '\n'
-        table += body
-        table += '    </table>' + '\n'
-        html.write(table)
-        
-        html.write('    <br>' + '\n')
-        html.write('  </div>' + '\n')
-        html.write('</body>' + '\n')
-        html.write( _htmlTail() )
-    html.close()
-
 def exportCombinedSummary(path, case, results, testSolution, plotList, relativeNorm, maxNorm, div_string_mat):
   """
   testSolution, plotList, relativeNorm, maxNorm
@@ -321,66 +223,112 @@ def exportCombinedSummary(path, case, results, testSolution, plotList, relativeN
     html.write( _htmlHead(case + " Summary") )
     
     html.write('<body>' + '\n')
-    html.write('  <h2 class="text-center">{}</h2>'.format(case + " Summary") + '\n')
+    html.write('<h2 class="text-center">{}</h2>'.format(case + " Summary") + '\n')
     
-    # Channel - Relative Norm - Max Norm
     # For the summary
     data_s = [(r[0], r[1], r[2]) for i,r in enumerate(results)]
 
     # For the plots
-    data_p = [('<button type="button" class="btn btn-info btn-lg" data-toggle="collapse" data-target="#{0}">{0} <strong class="fa fa-angle-double-down"></strong></button>'.format(plot), relativeNorm[i], maxNorm[i]) for i,plot in enumerate(plotList)]    
+    data_p = [('<input type="checkbox" name="which_graphs" value="{0}">{0}<br>'.format(plot)) for i,plot in enumerate(plotList)] 
+    # data_p = [('<button type="button" class="btn btn-info btn-lg" data-toggle="collapse" data-target="#{0}">{0} <strong class="fa fa-angle-double-down"></strong></button>'.format(plot)) for i,plot in enumerate(plotList)]    
 
-    # table = _tableHead(['Channel', 'Relative Max Norm', 'Infinity Norm'])
-    body = '  <div class="container">\n'
-    body += '  <button class="btn btn-primary" type="button" data-toggle="collapse" data-target=".multi-collapse">Expand/Collapse All Graphs <strong class="fa fa-angle-double-down"></strong></button>\n'
-    body += '  <br><br>\n'
-    body += '    <div>\n'
+    body = '<div class="container">\n'
+    body += '<button class="btn btn-primary" type="button" onclick="return expandCollapseGraphs();">Expand/Collapse All Graphs <strong class="fa fa-angle-double-down"></strong></button>\n'
+    body += '<br><br>\n'
+    body += '<div>\n'
 
     # For the buttons on top to dropdown each graph
     ncols = 5
+ 
+    # body += '<form method="post" action="/Tests/Post">\n' 
+    body += '<form>\n'
+    body += '<fieldset>\n'  
+    body += '<legend>Select which graphs you would like to view</legend>\n' 
 
     for i, d in enumerate(data_s):
       # current_row = (i)//ncols
       current_col = (i)%ncols
       
       if (current_col == 0):
-        body += '      <div class="row">\n'
+        body += '<div class="row">\n'
       
-      body += '        <div class="col-sm">\n'
-      body += '{0:s}'.format(data_p[i][0])
-      body += '        </div>'
+      body += '<div class="col-sm">\n'
+      body += '{0:s}'.format(data_p[i])
+      body += '</div>'
       
       if (current_col == (ncols-1)):
-        body += '      </div>\n'
+        body += '</div>\n'
     
     for i in range(current_col,ncols-1):
-      body += '      <div class="col-sm">\n'
-      body += '      </div>\n'
+      body += '<div class="col-sm">\n'
+      body += '</div>\n'
 
-    body += '    </div>\n'
-    body += '  <br>\n'
-
-    # For the containers used to hold the graphs
-    ncols = 1
+    body += '</div>\n'
+    body += '<br>\n'
+    body += '<button type="button" onclick="return showGraphs();">Submit</button>\n' 
+    body += '</fieldset>\n'  
+    body += '</form>\n'
+    body += '<br>\n'
 
     for i, d in enumerate(data_s):
-      # current_row = (i)//ncols
-      current_col = (i)%ncols
-      # fmt = '{0:0.4e}'
-
       # Write the current channel button to the table
-      body += '        <div class="col-sm" style="padding: 0px; height: 500px;">\n'
+      body += '<div class="col-sm" style="padding: 0px; height: 500px;">\n'
 
-      body += '          <div id="{}" class="collapse multi-collapse" style="border-style: solid; height: 500px;">\n'.format(d[0])
-
+      body += '<div id="{}" name="the_graphs" style="border-style: solid; height: 500px; display: none">\n'.format(d[0])
+      # body += '<div id="{}" class="collapse multi-collapse" style="border-style: solid; height: 500px;">\n'.format(d[0])
+      
       body += div_string_mat[i].replace('px','%')
-      body += '          </div>\n'
+      body += '</div>\n'
 
-    body += '  </div>\n'
+    body += '</div>\n'
     html.write(body)
 
     html.write('</body>' + '\n')
     html.write( _htmlTail() )
+
+    body = ''
+    body += '<script type="text/javascript">\n'  
+    body += 'function showGraphs()\n'  
+    body += '{\n' 
+    body += '  var checkboxes = document.getElementsByName("which_graphs");\n'   
+    body += '  for (var i = 0; i < checkboxes.length; i++)\n'  
+    body += '  {\n'  
+    body += '    if (checkboxes[i].checked)\n' 
+    body += '    {\n'
+    body += '      var current_box = document.getElementById(checkboxes[i].value);\n'
+    body += '      current_box.style.display = "block";\n'
+    body += '    }\n'       
+    body += '  }\n'
+    body += '}\n'
+    body += 'function expandCollapseGraphs()\n' 
+    body += '{\n' 
+    body += '  var all_graphs = document.getElementsByName("the_graphs");\n' 
+    body += '  var num_open = 0;\n'
+    body += '  for (var i = 0; i < all_graphs.length; i++)\n'  
+    body += '  {\n'  
+    body += '    if (all_graphs[i].style.display === "block")\n' 
+    body += '    {\n'
+    body += '      num_open += 1;\n'
+    body += '    }\n'       
+    body += '  }\n'
+    body += '  if (num_open > 0)\n'
+    body += '  {\n'
+    body += '    for (var i = 0; i < all_graphs.length; i++)\n'  
+    body += '    {\n'  
+    body += '      all_graphs[i].style.display = "none";\n'   
+    body += '    }\n'
+    body += '  }\n'
+    body += '  else\n'
+    body += '  {\n'
+    body += '    for (var i = 0; i < all_graphs.length; i++)\n'  
+    body += '    {\n'  
+    body += '      all_graphs[i].style.display = "block";\n'     
+    body += '    }\n'
+    body += '  }\n'
+    body += '}\n'    
+    body += '</script>\n'
+ 
+    html.write(body)
 
   html.close()
 

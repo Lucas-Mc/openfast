@@ -32,7 +32,7 @@ import subprocess
 import rtestlib as rtl
 import openfastDrivers
 import pass_fail
-from errorPlotting import exportCaseSummary
+# from errorPlotting import exportCaseSummary
 
 ##### Main program
 
@@ -111,21 +111,13 @@ testData, testInfo, testPack = pass_fail.readFASTOut(localOutFile)
 baselineData, baselineInfo, _ = pass_fail.readFASTOut(baselineOutFile)
 relativeNorm, maxNorm = pass_fail.calculateNorms(testData, baselineData, tolerance)
 
-# export all case summaries
+# Export all case summaries
 results = list(zip(testInfo["attribute_names"], relativeNorm, maxNorm))
-# path = testBuildDirectory
-# case = caseName
-# results = results
-# exportCaseSummary(testBuildDirectory, caseName, results)
 
-# failing case
-# if not pass_fail.passRegressionTest(relativeNorm, tolerance):
-    # if plotError:
-from errorPlotting import initializePlotDirectory, plotOpenfastError, exportCombinedSummary
-failChannels = [channel for i,channel in enumerate(testInfo["attribute_names"])]# if relativeNorm[i] > tolerance]
-failRelNorm = [relativeNorm[i] for i,channel in enumerate(testInfo["attribute_names"])]# if relativeNorm[i] > tolerance]
-failMaxNorm = [maxNorm[i] for i,channel in enumerate(testInfo["attribute_names"])] # if relativeNorm[i] > tolerance]
-# initializePlotDirectory(localOutFile, failChannels, failRelNorm, failMaxNorm)
+from errorPlotting import plotOpenfastError, exportCombinedSummary
+failChannels = [channel for i,channel in enumerate(testInfo["attribute_names"])]
+failRelNorm = [relativeNorm[i] for i,channel in enumerate(testInfo["attribute_names"])]
+failMaxNorm = [maxNorm[i] for i,channel in enumerate(testInfo["attribute_names"])]
 
 div_string_mat = []
 for channel in failChannels:
@@ -134,9 +126,7 @@ for channel in failChannels:
   except:
     error = sys.exc_info()[1]
     print("Error generating plots: {}".format(error.msg))
-# sys.exit(1)
 
 exportCombinedSummary(testBuildDirectory, caseName, results, localOutFile, failChannels, failRelNorm, failMaxNorm, div_string_mat)
     
-# passing case
 sys.exit(0)
