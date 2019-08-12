@@ -30,7 +30,7 @@ import plotly.offline
 import plotly.graph_objs as go
 
 def _validateAndExpandInputs(argv):
-  
+
     rtl.validateInputOrExit(argv, 3, "solution1 solution2 attribute")
     testSolution = argv[0]
     baselineSolution = argv[1]
@@ -76,13 +76,13 @@ def _plotError(xseries, y1series, y2series, xlabel, title1, title2, use_plotly=F
       
       fig.update_layout(
         autosize = False,
-        width = 1000,
-        height = 500,
+        width = 550,
+        height = 450,
         title_text = title1,
         titlefont = dict(size=24),
         xaxis = go.layout.XAxis(
           title_text = xlabel,
-          titlefont = dict(size=24)
+          titlefont = dict(size=18)
         )
       )
 
@@ -229,22 +229,20 @@ def exportCombinedSummary(path, case, results, testSolution, plotList, relativeN
     data_s = [(r[0], r[1], r[2]) for i,r in enumerate(results)]
 
     # For the plots
-    data_p = [('<input type="checkbox" name="which_graphs" value="{0}">{0}<br>'.format(plot)) for i,plot in enumerate(plotList)] 
-    # data_p = [('<button type="button" class="btn btn-info btn-lg" data-toggle="collapse" data-target="#{0}">{0} <strong class="fa fa-angle-double-down"></strong></button>'.format(plot)) for i,plot in enumerate(plotList)]    
+    data_p = [('<input type="checkbox" name="which_graphs" value="{0}">{0}<br>'.format(plot)) for i,plot in enumerate(plotList)]     
 
     body = '<div class="container">\n'
     body += '<button class="btn btn-primary" type="button" onclick="return expandCollapseGraphs();">Expand/Collapse All Graphs <strong class="fa fa-angle-double-down"></strong></button>\n'
     body += '<br><br>\n'
     body += '<div>\n'
 
+    body += '<form>\n'
+    body += '<fieldset>\n'  
+    body += '<legend>Select which graphs you would like to view:</legend>\n' 
+
     # For the buttons on top to dropdown each graph
     ncols = 5
  
-    # body += '<form method="post" action="/Tests/Post">\n' 
-    body += '<form>\n'
-    body += '<fieldset>\n'  
-    body += '<legend>Select which graphs you would like to view</legend>\n' 
-
     for i, d in enumerate(data_s):
       # current_row = (i)//ncols
       current_col = (i)%ncols
@@ -270,17 +268,27 @@ def exportCombinedSummary(path, case, results, testSolution, plotList, relativeN
     body += '</form>\n'
     body += '<br>\n'
 
-    for i, d in enumerate(data_s):
-      # Write the current channel button to the table
-      body += '<div class="col-sm" style="padding: 0px; height: 500px;">\n'
+    ncols = 2
 
-      body += '<div id="{}" name="the_graphs" style="border-style: solid; height: 500px; display: none">\n'.format(d[0])
-      # body += '<div id="{}" class="collapse multi-collapse" style="border-style: solid; height: 500px;">\n'.format(d[0])
-      
+    for i, d in enumerate(data_s):
+      current_row = (i)//ncols
+      current_col = (i)%ncols
+
+      if (current_col == 0):
+        body += '<div class="row">\n'
+
+      # Write the current channel button to the table
+      body += '<div id="{0}{1}" class="col-sm" style="padding: 0px; height: 475px; display: none">\n'.format(current_row,current_col)
+      body += '</div>\n'
+
+      if (current_col == (ncols-1)):
+        body += '</div>\n'
+
+    for i, d in enumerate(data_s):
+      body += '<div id="{}" name="the_graphs" style="border-style: solid; height: 475px; display: none">\n'.format(d[0])
       body += div_string_mat[i].replace('px','%')
       body += '</div>\n'
 
-    body += '</div>\n'
     html.write(body)
 
     html.write('</body>' + '\n')
@@ -295,8 +303,11 @@ def exportCombinedSummary(path, case, results, testSolution, plotList, relativeN
     body += '  {\n'  
     body += '    if (checkboxes[i].checked)\n' 
     body += '    {\n'
-    body += '      var current_box = document.getElementById(checkboxes[i].value);\n'
-    body += '      current_box.style.display = "block";\n'
+    body += '      document.getElementById(checkboxes[i].value).style.display = "block";\n'
+    body += '    }\n'
+    body += '    else\n'
+    body += '    {\n'
+    body += '      document.getElementById(checkboxes[i].value).style.display = "none";\n'
     body += '    }\n'       
     body += '  }\n'
     body += '}\n'
@@ -306,6 +317,7 @@ def exportCombinedSummary(path, case, results, testSolution, plotList, relativeN
     body += '  var num_open = 0;\n'
     body += '  for (var i = 0; i < all_graphs.length; i++)\n'  
     body += '  {\n'  
+    body += '    document.getElementsByName("which_graphs")[i].checked = false;\n'
     body += '    if (all_graphs[i].style.display === "block")\n' 
     body += '    {\n'
     body += '      num_open += 1;\n'
@@ -321,7 +333,8 @@ def exportCombinedSummary(path, case, results, testSolution, plotList, relativeN
     body += '  else\n'
     body += '  {\n'
     body += '    for (var i = 0; i < all_graphs.length; i++)\n'  
-    body += '    {\n'  
+    body += '    {\n'
+    body += '      document.getElementsByName("which_graphs")[i].checked = true;\n'  
     body += '      all_graphs[i].style.display = "block";\n'     
     body += '    }\n'
     body += '  }\n'

@@ -171,6 +171,9 @@ failRelNorm = [normalizedNorm[i] for i,channel in enumerate(testInfo["attribute_
 failMaxNorm = [maxNorm[i] for i,channel in enumerate(testInfo["attribute_names"])]
 
 div_string_mat = []
+# Take out the time channel
+failChannels = failChannels[1:]
+results = results[1:]
 for channel in failChannels:
   try:
     div_string_mat.append(plotOpenfastError(localOutFile, baselineOutFile, channel, use_plotly=True))
