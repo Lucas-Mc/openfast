@@ -32,7 +32,6 @@ import subprocess
 import rtestlib as rtl
 import openfastDrivers
 import pass_fail
-from errorPlotting import exportCaseSummary
 
 ##### Main program
 
@@ -113,18 +112,24 @@ relativeNorm, maxNorm = pass_fail.calculateNorms(testData, baselineData, toleran
 
 # export all case summaries
 results = list(zip(testInfo["attribute_names"], relativeNorm, maxNorm))
-exportCaseSummary(testBuildDirectory, caseName, results)
 
 # failing case
 if not pass_fail.passRegressionTest(relativeNorm, tolerance):
     if plotError:
-        from errorPlotting import initializePlotDirectory, plotOpenfastError
+        from errorPlotting import plotOpenfastError, exportCombinedSummary
         failChannels = [channel for i,channel in enumerate(testInfo["attribute_names"]) if relativeNorm[i] > tolerance]
         failRelNorm = [relativeNorm[i] for i,channel in enumerate(testInfo["attribute_names"]) if relativeNorm[i] > tolerance]
         failMaxNorm = [maxNorm[i] for i,channel in enumerate(testInfo["attribute_names"]) if relativeNorm[i] > tolerance]
-        initializePlotDirectory(localOutFile, failChannels, failRelNorm, failMaxNorm)
+        # Extract the HTML code from Plotly
+        div_string_mat = []
+        # Take out the time channel
+        failChannels = failChannels[1:]
+        results = results[1:]
         for channel in failChannels:
-            plotOpenfastError(localOutFile, baselineOutFile, channel)
+            div_string_mat.append(plotOpenfastError(localOutFile, baselineOutFile, channel, use_plotly=True))
+
+        exportCombinedSummary(testBuildDirectory, caseName, results, localOutFile, failChannels, failRelNorm, failMaxNorm, div_string_mat)
+
     sys.exit(1)
     
 # passing case
