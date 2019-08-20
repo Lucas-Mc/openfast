@@ -102,7 +102,7 @@ def _savePlot(plt, path, foutname):
 def plotOpenfastError(testSolution, baselineSolution, attribute, use_plotly=False):
     testSolution, baselineSolution, attribute = _validateAndExpandInputs([testSolution, baselineSolution, attribute])
     dict1, info1 = _parseSolution(testSolution)
-    dict2, info2 = _parseSolution(baselineSolution)
+    dict2, _ = _parseSolution(baselineSolution)
 
     try:
         channel = info1['attribute_names'].index(attribute)
@@ -221,7 +221,7 @@ def exportCombinedSummary(path, case, results, testSolution, plotList, relativeN
 
         body += '<form>\n'
         body += '<fieldset>\n'  
-        body += '<legend>Select which graphs you would like to view:</legend>\n' 
+        body += '<legend>Select the channels to plot:</legend>\n' 
         body += '<button class="btn btn-primary" type="button" onclick="return expandCollapseGraphs();">Expand/Collapse All Graphs <strong class="fa fa-angle-double-down"></strong></button>\n'
         body += '<br><br>\n'
 
@@ -233,17 +233,16 @@ def exportCombinedSummary(path, case, results, testSolution, plotList, relativeN
         for i, d in enumerate(data_s):
           
             if d[0] in plotList:
-                # current_row = (i)//ncols
-                current_col = (dc)%ncols
+                current_col = (dc) % ncols
     
-                if (current_col == 0):
+                if current_col == 0:
                     body += '<div class="row">\n'
                   
                 body += '<div class="col-sm">\n'
                 body += '{0:s}'.format(data_p[dc])
                 body += '</div>'
     
-                if (current_col == (ncols-1)):
+                if current_col == (ncols - 1):
                     body += '</div>\n'
               
                 dc += 1
@@ -289,51 +288,51 @@ def exportCombinedSummary(path, case, results, testSolution, plotList, relativeN
         html.write('</body>' + '\n')
         html.write( _htmlTail() )
 
-        body = ''
-        body += '<script type="text/javascript">\n'  
-        body += 'function showGraphs()\n'  
-        body += '{\n' 
-        body += '   var checkboxes = document.getElementsByName("which_graphs");\n'   
-        body += '   for (var i = 0; i < checkboxes.length; i++)\n'  
-        body += '   {\n'  
-        body += '       if (checkboxes[i].checked)\n' 
-        body += '       {\n'
-        body += '           document.getElementById(checkboxes[i].value).style.display = "block";\n'
-        body += '       }\n'
-        body += '       else\n'
-        body += '       {\n'
-        body += '           document.getElementById(checkboxes[i].value).style.display = "none";\n'
-        body += '       }\n'       
-        body += '   }\n'
-        body += '}\n'
-        body += 'function expandCollapseGraphs()\n' 
-        body += '{\n' 
-        body += '   var all_graphs = document.getElementsByName("the_graphs");\n' 
-        body += '   var num_open = 0;\n'
-        body += '   for (var i = 0; i < all_graphs.length; i++)\n'  
-        body += '   {\n'  
-        body += '       document.getElementsByName("which_graphs")[i].checked = false;\n'
-        body += '       if (all_graphs[i].style.display === "block")\n' 
-        body += '       {\n'
-        body += '           num_open += 1;\n'
-        body += '       }\n'       
-        body += '   }\n'
-        body += '   if (num_open > 0)\n'
-        body += '   {\n'
-        body += '       for (var i = 0; i < all_graphs.length; i++)\n'  
-        body += '       {\n'  
-        body += '           all_graphs[i].style.display = "none";\n'   
-        body += '       }\n'
-        body += '   }\n'
-        body += '   else\n'
-        body += '   {\n'
-        body += '       for (var i = 0; i < all_graphs.length; i++)\n'  
-        body += '       {\n'
-        body += '           document.getElementsByName("which_graphs")[i].checked = true;\n'  
-        body += '           all_graphs[i].style.display = "block";\n'     
-        body += '       }\n'
-        body += '   }\n'
-        body += '}\n'    
-        body += '</script>\n'
+        script = ''
+        script += '<script type="text/javascript">\n'  
+        script += 'function showGraphs()\n'  
+        script += '{\n' 
+        script += '   var checkboxes = document.getElementsByName("which_graphs");\n'   
+        script += '   for (var i = 0; i < checkboxes.length; i++)\n'  
+        script += '   {\n'  
+        script += '       if (checkboxes[i].checked)\n' 
+        script += '       {\n'
+        script += '           document.getElementById(checkboxes[i].value).style.display = "block";\n'
+        script += '       }\n'
+        script += '       else\n'
+        script += '       {\n'
+        script += '           document.getElementById(checkboxes[i].value).style.display = "none";\n'
+        script += '       }\n'       
+        script += '   }\n'
+        script += '}\n'
+        script += 'function expandCollapseGraphs()\n' 
+        script += '{\n' 
+        script += '   var all_graphs = document.getElementsByName("the_graphs");\n' 
+        script += '   var num_open = 0;\n'
+        script += '   for (var i = 0; i < all_graphs.length; i++)\n'  
+        script += '   {\n'  
+        script += '       document.getElementsByName("which_graphs")[i].checked = false;\n'
+        script += '       if (all_graphs[i].style.display === "block")\n' 
+        script += '       {\n'
+        script += '           num_open += 1;\n'
+        script += '       }\n'       
+        script += '   }\n'
+        script += '   if (num_open > 0)\n'
+        script += '   {\n'
+        script += '       for (var i = 0; i < all_graphs.length; i++)\n'  
+        script += '       {\n'  
+        script += '           all_graphs[i].style.display = "none";\n'   
+        script += '       }\n'
+        script += '   }\n'
+        script += '   else\n'
+        script += '   {\n'
+        script += '       for (var i = 0; i < all_graphs.length; i++)\n'  
+        script += '       {\n'
+        script += '           document.getElementsByName("which_graphs")[i].checked = true;\n'  
+        script += '           all_graphs[i].style.display = "block";\n'     
+        script += '       }\n'
+        script += '   }\n'
+        script += '}\n'    
+        script += '</script>\n'
 
-        html.write(body)
+        html.write(script)
