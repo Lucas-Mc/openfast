@@ -201,7 +201,6 @@ def exportResultsSummary(path, results):
         html.write('  </div>' + '\n')
         html.write('</body>' + '\n')
         html.write( _htmlTail() )
-    html.close()
     
 def exportCombinedSummary(path, case, results, testSolution, plotList, relativeNorm, maxNorm, div_string_mat):
     with open(os.path.join(path, case+".html"), "w") as html:
