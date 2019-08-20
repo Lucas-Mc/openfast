@@ -51,52 +51,49 @@ def _plotError(xseries, y1series, y2series, xlabel, title1, title2, use_plotly=F
     import matplotlib.pyplot as plt
     from matplotlib.ticker import FormatStrFormatter
 
-    if (use_plotly is True):
-
-      fig = go.Figure()
-
-      fig.add_trace(go.Scatter(x = xseries, y = y2series,
-                    mode = 'lines',
-                    line_width = 3,
-                    line_color = 'green',
-                    name = 'Baseline'
-                    )
-      )
-
-      fig.add_trace(go.Scatter(x = xseries, y = y1series,
-                    mode = 'lines',
-                    line_width = 1,
-                    line_color = 'red',
-                    name = 'Local'
-                    )
-      )
-      
-      fig.update_layout(
-          autosize = False,
-          width = 550,
-          height = 450,
-          title_text = title1,
-          titlefont = dict(size=24),
-          xaxis = go.layout.XAxis(
-              title_text = xlabel,
-              titlefont = dict(size=18)
-          )
-      )
-
-      div_string = plotly.offline.plot(fig, include_plotlyjs=False, output_type='div')
-
-      return div_string
-
+    if use_plotly:
+        fig = go.Figure()
+        fig.add_trace(
+            go.Scatter(
+                x = xseries,
+                y = y2series,
+                mode = 'lines',
+                line_width = 3,
+                line_color = 'green',
+                name = 'Baseline'
+            )
+        )
+        fig.add_trace(
+            go.Scatter(
+                x = xseries,
+                y = y1series,
+                mode = 'lines',
+                line_width = 1,
+                line_color = 'red',
+                name = 'Local'
+            )
+        )
+        fig.update_layout(
+            autosize = False,
+            width = 550,
+            height = 450,
+            title_text = title1,
+            titlefont = dict(size=24),
+            xaxis = go.layout.XAxis(
+                title_text = xlabel,
+                titlefont = dict(size=18)
+            )
+        )
+        div_string = plotly.offline.plot(fig, include_plotlyjs=False, output_type='div')
+        return div_string
     else:
         plt.figure()
-
         plt.title(title1)
         plt.grid(True)
         plt.plot(xseries, y2series, "g", linestyle="solid", linewidth=3, label = "Baseline")
         plt.plot(xseries, y1series, "r", linestyle="solid", linewidth=1, label = "Local")
         plt.legend()
         plt.tight_layout()
-
         return plt
 
 def _savePlot(plt, path, foutname):
@@ -105,7 +102,7 @@ def _savePlot(plt, path, foutname):
 def plotOpenfastError(testSolution, baselineSolution, attribute, use_plotly=False):
     testSolution, baselineSolution, attribute = _validateAndExpandInputs([testSolution, baselineSolution, attribute])
     dict1, info1 = _parseSolution(testSolution)
-    dict2, info2 = _parseSolution(baselineSolution)
+    dict2, _ = _parseSolution(baselineSolution)
 
     try:
         channel = info1['attribute_names'].index(attribute)
@@ -120,13 +117,10 @@ def plotOpenfastError(testSolution, baselineSolution, attribute, use_plotly=Fals
     y1series = np.array(dict1[:, channel], dtype = np.float)
     y2series = np.array(dict2[:, channel], dtype = np.float)
 
-    if (use_plotly is True):
-
+    if use_plotly:
         div_string = _plotError(timevec, y1series, y2series, xlabel, title1, title2, use_plotly=True)
         return div_string
-
     else:
-
         plt = _plotError(timevec, y1series, y2series, xlabel, title1, title2)
         basePath = os.path.sep.join(testSolution.split(os.path.sep)[:-1])
         plotPath = os.path.join(basePath, "plots")
@@ -138,14 +132,21 @@ def _htmlHead(title):
     head  = '<!DOCTYPE html>' + '\n'
     head += '<html>' + '\n'
     head += '<head>' + '\n'
-    head += '  <title>5MW_ITIBarge_DLL_WTurb_WavesIrr Summary</title>' + '\n'
+    head += '  <title>{}</title>'.format(title) + '\n'
     head += '  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>' + '\n'
     head += '  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>' + '\n'
     head += '  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>' + '\n'
-    head += '  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">' + '\n'
-    head += '  <style media="screen" type="text/css">    .cell-warning {      background-color: #FF6666;    }    .cell-highlight {      background-color: #E5E589;    }  </style>' + '\n'
-    head += '  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">\n'
     head += '  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>\n'
+    head += '  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">' + '\n'
+    head += '  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">\n'
+    head += '  <style media="screen" type="text/css">'
+    head += '    .cell-warning {'
+    head += '      background-color: #FF6666;'
+    head += '    }'
+    head += '    .cell-highlight {'
+    head += '      background-color: #E5E589;'
+    head += '    }'
+    head += '  </style>'
     head += '</head>' + '\n'
     return head
 
@@ -200,147 +201,138 @@ def exportResultsSummary(path, results):
         html.write('  </div>' + '\n')
         html.write('</body>' + '\n')
         html.write( _htmlTail() )
-    html.close()
     
 def exportCombinedSummary(path, case, results, testSolution, plotList, relativeNorm, maxNorm, div_string_mat):
-  """
-  testSolution, plotList, relativeNorm, maxNorm
-  path, case, results
-  """
-  with open(os.path.join(path, case+".html"), "w") as html:
+    with open(os.path.join(path, case+".html"), "w") as html:
       
-      html.write( _htmlHead(case + " Summary") )
+        html.write( _htmlHead(case + " Summary") )
 
-      html.write('<body>' + '\n')
-      html.write('<h2 class="text-center">{}</h2>'.format(case + " Summary") + '\n')
-      
-      # For the summary
-      data_s = [(r[0], r[1], r[2]) for i,r in enumerate(results)]
+        html.write('<body>' + '\n')
+        html.write('<h2 class="text-center">{}</h2>'.format(case + " Summary") + '\n')
 
-      # For the plots
-      data_p = [('<input type="checkbox" name="which_graphs" value="{0}">{0}<br>'.format(plot)) for i,plot in enumerate(plotList)]     
+        # For the summary
+        data_s = [(r[0], r[1], r[2]) for i,r in enumerate(results)]
 
-      body = '<div class="container">\n'
-      body += '<div>\n'
+        # For the plots
+        data_p = [('<input type="checkbox" name="which_graphs" value="{0}">{0}<br>'.format(plot)) for i,plot in enumerate(plotList)]     
 
-      body += '<form>\n'
-      body += '<fieldset>\n'  
-      body += '<legend>Select which graphs you would like to view:</legend>\n' 
-      body += '<button class="btn btn-primary" type="button" onclick="return expandCollapseGraphs();">Expand/Collapse All Graphs <strong class="fa fa-angle-double-down"></strong></button>\n'
-      body += '<br><br>\n'
+        body = '<div class="container">\n'
+        body += '<div>\n'
 
-      # For the buttons on top to dropdown each graph
-      ncols = 5
-      current_col = 0
-      dc = 0
+        body += '<form>\n'
+        body += '<fieldset>\n'  
+        body += '<legend>Select the channels to plot:</legend>\n' 
+        body += '<button class="btn btn-primary" type="button" onclick="return expandCollapseGraphs();">Expand/Collapse All Graphs <strong class="fa fa-angle-double-down"></strong></button>\n'
+        body += '<br><br>\n'
+
+        # For the buttons on top to dropdown each graph
+        ncols = 5
+        current_col = 0
+        dc = 0
   
-      for i, d in enumerate(data_s):
+        for i, d in enumerate(data_s):
           
-          if d[0] in plotList:
-              # current_row = (i)//ncols
-              current_col = (dc)%ncols
+            if d[0] in plotList:
+                current_col = (dc) % ncols
     
-              if (current_col == 0):
-                  body += '<div class="row">\n'
+                if current_col == 0:
+                    body += '<div class="row">\n'
                   
-              body += '<div class="col-sm">\n'
-              body += '{0:s}'.format(data_p[dc])
-              body += '</div>'
+                body += '<div class="col-sm">\n'
+                body += '{0:s}'.format(data_p[dc])
+                body += '</div>'
     
-              if (current_col == (ncols-1)):
-                  body += '</div>\n'
+                if current_col == (ncols - 1):
+                    body += '</div>\n'
               
-              dc += 1
+                dc += 1
           
-      for i in range(current_col,ncols-1):
-          body += '<div class="col-sm">\n'
-          body += '</div>\n'
+        for i in range(current_col,ncols-1):
+            body += '<div class="col-sm">\n'
+            body += '</div>\n'
 
-      body += '</div>\n'
-      body += '<br>\n'
-      body += '<button type="button" onclick="return showGraphs();">Submit</button>\n' 
-      body += '</fieldset>\n'  
-      body += '</form>\n'
-      body += '<br>\n'
+        body += '</div>\n'
+        body += '<br>\n'
+        body += '<button type="button" onclick="return showGraphs();">Submit</button>\n' 
+        body += '</fieldset>\n'  
+        body += '</form>\n'
+        body += '<br>\n'
 
-      ncols = 2
+        ncols = 2
 
-      for i, d in enumerate(data_s):
-          current_row = (i)//ncols
-          current_col = (i)%ncols
+        for i, d in enumerate(data_s):
+            current_row = (i)//ncols
+            current_col = (i)%ncols
 
-          if (current_col == 0):
-              body += '<div class="row">\n'
+            if (current_col == 0):
+                body += '<div class="row">\n'
 
-          # Write the current channel button to the table
-          body += '<div id="{0}{1}" class="col-sm" style="padding: 0px; height: 475px; display: none">\n'.format(current_row,current_col)
-          body += '</div>\n'
+            # Write the current channel button to the table
+            body += '<div id="{0}{1}" class="col-sm" style="padding: 0px; height: 475px; display: none">\n'.format(current_row,current_col)
+            body += '</div>\n'
 
-          if (current_col == (ncols-1)):
-              body += '</div>\n'
+            if (current_col == (ncols-1)):
+                body += '</div>\n'
 
-      if (len(div_string_mat) > 0):
-          dc = 0
-          for i, d in enumerate(data_s):  
-              if d[0] in plotList:
-                  body += '<div id="{}" name="the_graphs" style="border-style: solid; height: 475px; display: none">\n'.format(d[0])
-                  body += div_string_mat[dc].replace('px','%')
-                  body += '</div>\n'
-                  dc += 1
+        if (len(div_string_mat) > 0):
+            dc = 0
+            for i, d in enumerate(data_s):  
+                if d[0] in plotList:
+                    body += '<div id="{}" name="the_graphs" style="border-style: solid; height: 475px; display: none">\n'.format(d[0])
+                    body += div_string_mat[dc].replace('px','%')
+                    body += '</div>\n'
+                    dc += 1
 
-      html.write(body)
+        html.write(body)
 
-      html.write('</body>' + '\n')
-      html.write( _htmlTail() )
+        html.write('</body>' + '\n')
+        html.write( _htmlTail() )
 
-      body = ''
-      body += '<script type="text/javascript">\n'  
-      body += 'function showGraphs()\n'  
-      body += '{\n' 
-      body += '   var checkboxes = document.getElementsByName("which_graphs");\n'   
-      body += '   for (var i = 0; i < checkboxes.length; i++)\n'  
-      body += '   {\n'  
-      body += '       if (checkboxes[i].checked)\n' 
-      body += '       {\n'
-      body += '           document.getElementById(checkboxes[i].value).style.display = "block";\n'
-      body += '       }\n'
-      body += '       else\n'
-      body += '       {\n'
-      body += '           document.getElementById(checkboxes[i].value).style.display = "none";\n'
-      body += '       }\n'       
-      body += '   }\n'
-      body += '}\n'
-      body += 'function expandCollapseGraphs()\n' 
-      body += '{\n' 
-      body += '   var all_graphs = document.getElementsByName("the_graphs");\n' 
-      body += '   var num_open = 0;\n'
-      body += '   for (var i = 0; i < all_graphs.length; i++)\n'  
-      body += '   {\n'  
-      body += '       document.getElementsByName("which_graphs")[i].checked = false;\n'
-      body += '       if (all_graphs[i].style.display === "block")\n' 
-      body += '       {\n'
-      body += '           num_open += 1;\n'
-      body += '       }\n'       
-      body += '   }\n'
-      body += '   if (num_open > 0)\n'
-      body += '   {\n'
-      body += '       for (var i = 0; i < all_graphs.length; i++)\n'  
-      body += '       {\n'  
-      body += '           all_graphs[i].style.display = "none";\n'   
-      body += '       }\n'
-      body += '   }\n'
-      body += '   else\n'
-      body += '   {\n'
-      body += '       for (var i = 0; i < all_graphs.length; i++)\n'  
-      body += '       {\n'
-      body += '           document.getElementsByName("which_graphs")[i].checked = true;\n'  
-      body += '           all_graphs[i].style.display = "block";\n'     
-      body += '       }\n'
-      body += '   }\n'
-      body += '}\n'    
-      body += '</script>\n'
-      
-      html.write(body)
+        script = ''
+        script += '<script type="text/javascript">\n'  
+        script += 'function showGraphs()\n'  
+        script += '{\n' 
+        script += '   var checkboxes = document.getElementsByName("which_graphs");\n'   
+        script += '   for (var i = 0; i < checkboxes.length; i++)\n'  
+        script += '   {\n'  
+        script += '       if (checkboxes[i].checked)\n' 
+        script += '       {\n'
+        script += '           document.getElementById(checkboxes[i].value).style.display = "block";\n'
+        script += '       }\n'
+        script += '       else\n'
+        script += '       {\n'
+        script += '           document.getElementById(checkboxes[i].value).style.display = "none";\n'
+        script += '       }\n'       
+        script += '   }\n'
+        script += '}\n'
+        script += 'function expandCollapseGraphs()\n' 
+        script += '{\n' 
+        script += '   var all_graphs = document.getElementsByName("the_graphs");\n' 
+        script += '   var num_open = 0;\n'
+        script += '   for (var i = 0; i < all_graphs.length; i++)\n'  
+        script += '   {\n'  
+        script += '       document.getElementsByName("which_graphs")[i].checked = false;\n'
+        script += '       if (all_graphs[i].style.display === "block")\n' 
+        script += '       {\n'
+        script += '           num_open += 1;\n'
+        script += '       }\n'       
+        script += '   }\n'
+        script += '   if (num_open > 0)\n'
+        script += '   {\n'
+        script += '       for (var i = 0; i < all_graphs.length; i++)\n'  
+        script += '       {\n'  
+        script += '           all_graphs[i].style.display = "none";\n'   
+        script += '       }\n'
+        script += '   }\n'
+        script += '   else\n'
+        script += '   {\n'
+        script += '       for (var i = 0; i < all_graphs.length; i++)\n'  
+        script += '       {\n'
+        script += '           document.getElementsByName("which_graphs")[i].checked = true;\n'  
+        script += '           all_graphs[i].style.display = "block";\n'     
+        script += '       }\n'
+        script += '   }\n'
+        script += '}\n'    
+        script += '</script>\n'
 
-  html.close()
-
+        html.write(script)
