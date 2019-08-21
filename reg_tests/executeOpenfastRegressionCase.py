@@ -175,7 +175,6 @@ if not pass_fail.passRegressionTest(normalizedNorm, tolerance):
         div_string_mat = []
         for channel in failChannels:
             div_string_mat.append(plotOpenfastError(localOutFile, baselineOutFile, channel))
-
         exportCombinedSummary(testBuildDirectory, caseName, results, localOutFile, failChannels, failRelNorm, failMaxNorm, div_string_mat)
 
     sys.exit(1)

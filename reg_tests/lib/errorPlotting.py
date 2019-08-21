@@ -46,27 +46,28 @@ def _parseSolution(solution):
         rtl.exitWithError("Error: {}".format(e))
 
 def _plotError(xseries, y1series, y2series, xlabel, title1, title2):
-    import matplotlib
-    matplotlib.use("Agg")
-    import matplotlib.pyplot as plt
-    from matplotlib.ticker import FormatStrFormatter
-
     fig = go.Figure()
     # TODO: Fix the colors to be more user-friendly
-    fig.add_trace(go.Scatter(x = xseries, y = y2series,
-                  mode = 'lines',
-                  line_width = 3,
-                  line_color = 'green',
-                  name = 'Baseline'
-                  )
+    fig.add_trace(
+        go.Scatter(
+            x = xseries,
+            y = y2series,
+            mode = 'lines',
+            line_width = 3,
+            line_color = 'green',
+            name = 'Baseline'
+        )
     )
     # TODO: Fix the colors to be more user-friendly
-    fig.add_trace(go.Scatter(x = xseries, y = y1series,
-                  mode = 'lines',
-                  line_width = 1,
-                  line_color = 'red',
-                  name = 'Local'
-                  )
+    fig.add_trace(
+        go.Scatter(
+            x = xseries,
+            y = y1series,
+            mode = 'lines',
+            line_width = 1,
+            line_color = 'red',
+            name = 'Local'
+        )
     )
     
     fig.update_layout(
