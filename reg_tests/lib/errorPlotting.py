@@ -54,7 +54,7 @@ def _plotError(xseries, y1series, y2series, xlabel, title1, title2):
             y = y2series,
             mode = 'lines',
             line_width = 3,
-            line_color = 'green',
+            line_color = 'rgb(0,0,0)',
             name = 'Baseline'
         )
     )
@@ -65,7 +65,7 @@ def _plotError(xseries, y1series, y2series, xlabel, title1, title2):
             y = y1series,
             mode = 'lines',
             line_width = 1,
-            line_color = 'red',
+            line_color = 'rgb(230,159,0)',
             name = 'Local'
         )
     )
