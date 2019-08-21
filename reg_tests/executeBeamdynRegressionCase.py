@@ -122,11 +122,8 @@ if not pass_fail.passRegressionTest(relativeNorm, tolerance):
         failMaxNorm = [maxNorm[i] for i,channel in enumerate(testInfo["attribute_names"]) if relativeNorm[i] > tolerance]
         # Extract the HTML code from Plotly
         div_string_mat = []
-        # Take out the time channel
-        failChannels = failChannels[1:]
-        results = results[1:]
         for channel in failChannels:
-            div_string_mat.append(plotOpenfastError(localOutFile, baselineOutFile, channel, use_plotly=True))
+            div_string_mat.append(plotOpenfastError(localOutFile, baselineOutFile, channel))
 
         exportCombinedSummary(testBuildDirectory, caseName, results, localOutFile, failChannels, failRelNorm, failMaxNorm, div_string_mat)
 

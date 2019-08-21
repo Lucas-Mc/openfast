@@ -45,61 +45,47 @@ def _parseSolution(solution):
     except Exception as e:
         rtl.exitWithError("Error: {}".format(e))
 
-def _plotError(xseries, y1series, y2series, xlabel, title1, title2, use_plotly=False):
+def _plotError(xseries, y1series, y2series, xlabel, title1, title2):
     import matplotlib
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
     from matplotlib.ticker import FormatStrFormatter
 
-    if use_plotly:
-        fig = go.Figure()
-        fig.add_trace(
-            go.Scatter(
-                x = xseries,
-                y = y2series,
-                mode = 'lines',
-                line_width = 3,
-                line_color = 'green',
-                name = 'Baseline'
-            )
+    fig = go.Figure()
+    # TODO: Fix the colors to be more user-friendly
+    fig.add_trace(go.Scatter(x = xseries, y = y2series,
+                  mode = 'lines',
+                  line_width = 3,
+                  line_color = 'green',
+                  name = 'Baseline'
+                  )
+    )
+    # TODO: Fix the colors to be more user-friendly
+    fig.add_trace(go.Scatter(x = xseries, y = y1series,
+                  mode = 'lines',
+                  line_width = 1,
+                  line_color = 'red',
+                  name = 'Local'
+                  )
+    )
+    
+    fig.update_layout(
+        autosize = False,
+        width = 550,
+        height = 450,
+        title_text = title1,
+        titlefont = dict(size=24),
+        xaxis = go.layout.XAxis(
+            title_text = xlabel,
+            titlefont = dict(size=18)
         )
-        fig.add_trace(
-            go.Scatter(
-                x = xseries,
-                y = y1series,
-                mode = 'lines',
-                line_width = 1,
-                line_color = 'red',
-                name = 'Local'
-            )
-        )
-        fig.update_layout(
-            autosize = False,
-            width = 550,
-            height = 450,
-            title_text = title1,
-            titlefont = dict(size=24),
-            xaxis = go.layout.XAxis(
-                title_text = xlabel,
-                titlefont = dict(size=18)
-            )
-        )
-        div_string = plotly.offline.plot(fig, include_plotlyjs=False, output_type='div')
-        return div_string
-    else:
-        plt.figure()
-        plt.title(title1)
-        plt.grid(True)
-        plt.plot(xseries, y2series, "g", linestyle="solid", linewidth=3, label = "Baseline")
-        plt.plot(xseries, y1series, "r", linestyle="solid", linewidth=1, label = "Local")
-        plt.legend()
-        plt.tight_layout()
-        return plt
+    )
 
-def _savePlot(plt, path, foutname):
-    plt.savefig(os.path.join(path, foutname+".png"))
+    div_string = plotly.offline.plot(fig, include_plotlyjs=False, output_type='div')
 
-def plotOpenfastError(testSolution, baselineSolution, attribute, use_plotly=False):
+    return div_string
+
+def plotOpenfastError(testSolution, baselineSolution, attribute):
     testSolution, baselineSolution, attribute = _validateAndExpandInputs([testSolution, baselineSolution, attribute])
     dict1, info1 = _parseSolution(testSolution)
     dict2, _ = _parseSolution(baselineSolution)
@@ -117,16 +103,8 @@ def plotOpenfastError(testSolution, baselineSolution, attribute, use_plotly=Fals
     y1series = np.array(dict1[:, channel], dtype = np.float)
     y2series = np.array(dict2[:, channel], dtype = np.float)
 
-    if use_plotly:
-        div_string = _plotError(timevec, y1series, y2series, xlabel, title1, title2, use_plotly=True)
-        return div_string
-    else:
-        plt = _plotError(timevec, y1series, y2series, xlabel, title1, title2)
-        basePath = os.path.sep.join(testSolution.split(os.path.sep)[:-1])
-        plotPath = os.path.join(basePath, "plots")
-        rtl.validateDirOrMkdir(plotPath)
-        _savePlot(plt, plotPath, attribute)
-        plt.close()
+    div_string = _plotError(timevec, y1series, y2series, xlabel, title1, title2)
+    return div_string
     
 def _htmlHead(title):
     head  = '<!DOCTYPE html>' + '\n'
